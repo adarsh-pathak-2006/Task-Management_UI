@@ -43,7 +43,7 @@ export default function ProjectsPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await fetchApi('/projects/', {
+      await fetchApi('/projects/my-projects/', {
         method: 'POST',
         body: JSON.stringify(formData)
       });

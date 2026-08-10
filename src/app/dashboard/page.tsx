@@ -72,7 +72,7 @@ export default function DashboardOverview() {
             border: '1px solid var(--border-color)'
           }}>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>System Role</p>
-            <p style={{ fontWeight: 500, textTransform: 'capitalize' }}>{profile.role}</p>
+            <p style={{ fontWeight: 500, textTransform: 'capitalize' }}>{profile.user.role}</p>
           </div>
         </div>
       </div>
