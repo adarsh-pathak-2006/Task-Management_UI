@@ -5,7 +5,16 @@ export class ApiError extends Error {
   data: any;
 
   constructor(status: number, data: any) {
-    super(data.detail || data.non_field_errors?.[0] || 'An API error occurred');
+    let message = data.detail || data.non_field_errors?.[0];
+    if (!message && typeof data === 'object') {
+      const entries = Object.entries(data);
+      if (entries.length > 0) {
+        message = entries
+          .map(([field, errs]) => `${field}: ${Array.isArray(errs) ? errs.join(', ') : errs}`)
+          .join(' | ');
+      }
+    }
+    super(message || 'An API error occurred');
     this.status = status;
     this.data = data;
   }
