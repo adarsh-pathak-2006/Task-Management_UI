@@ -7,9 +7,10 @@ interface Project {
   id: number;
   name: string;
   description: string;
-  status: string;
-  created_by: number;
   created_at: string;
+  created_by: {
+    user: { username: string; first_name: string; last_name: string };
+  };
 }
 
 export default function ProjectsPage() {
@@ -17,7 +18,7 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [error, setError] = useState('');
-  const [formData, setFormData] = useState({ name: '', description: '', status: 'PLANNED' });
+  const [formData, setFormData] = useState({ name: '', description: '' });
 
   const loadProjects = async () => {
     setLoading(true);
@@ -42,7 +43,7 @@ export default function ProjectsPage() {
         body: JSON.stringify(formData),
       });
       setShowCreate(false);
-      setFormData({ name: '', description: '', status: 'PLANNED' });
+      setFormData({ name: '', description: '' });
       loadProjects();
     } catch (err: any) {
       setError(err.message || 'Failed to create project');
@@ -80,15 +81,6 @@ export default function ProjectsPage() {
               placeholder="What is this project about?"
               value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
           </div>
-          <div className="input-group">
-            <label className="input-label">Status</label>
-            <select className="input-field" value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })}>
-              <option value="PLANNED">Planned</option>
-              <option value="ACTIVE">Active</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="ON_HOLD">On Hold</option>
-            </select>
-          </div>
           <button type="submit" className="btn btn-primary">Create Project</button>
         </form>
       )}
@@ -101,33 +93,27 @@ export default function ProjectsPage() {
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-          {projects.map(project => {
-            const statusColors: Record<string, string> = {
-              PLANNED: 'rgba(99,102,241,0.15)',
-              ACTIVE: 'rgba(16,185,129,0.15)',
-              COMPLETED: 'rgba(59,130,246,0.15)',
-              ON_HOLD: 'rgba(245,158,11,0.15)',
-            };
-            const statusText: Record<string, string> = {
-              PLANNED: '#818cf8', ACTIVE: '#34d399', COMPLETED: '#60a5fa', ON_HOLD: '#fbbf24'
-            };
-            return (
-              <div key={project.id} className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
-                  <h3 style={{ fontWeight: 600, fontSize: '1.05rem', lineHeight: 1.3 }}>{project.name}</h3>
-                  <span style={{
-                    fontSize: '0.72rem', fontWeight: 600, padding: '0.25rem 0.6rem', borderRadius: 'var(--radius-full)',
-                    backgroundColor: statusColors[project.status] ?? 'rgba(99,102,241,0.15)',
-                    color: statusText[project.status] ?? '#818cf8', whiteSpace: 'nowrap', flexShrink: 0
-                  }}>{project.status.replace('_', ' ')}</span>
-                </div>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', flex: 1, lineHeight: 1.6 }}>{project.description}</p>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-color)', paddingTop: '0.75rem' }}>
-                  Created {new Date(project.created_at).toLocaleDateString()}
-                </div>
+          {projects.map(project => (
+            <div key={project.id} className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
+                <h3 style={{ fontWeight: 600, fontSize: '1.05rem', lineHeight: 1.3 }}>{project.name}</h3>
+                <span style={{
+                  fontSize: '0.72rem', fontWeight: 600, padding: '0.25rem 0.6rem',
+                  backgroundColor: 'rgba(16,185,129,0.15)', color: '#34d399',
+                  borderRadius: 'var(--radius-full)', whiteSpace: 'nowrap', flexShrink: 0
+                }}>Active</span>
               </div>
-            );
-          })}
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', flex: 1, lineHeight: 1.6 }}>{project.description}</p>
+              <div style={{
+                fontSize: '0.78rem', color: 'var(--text-muted)',
+                borderTop: '1px solid var(--border-color)', paddingTop: '0.75rem',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+              }}>
+                <span>By {project.created_by?.user?.first_name || project.created_by?.user?.username}</span>
+                <span>{new Date(project.created_at).toLocaleDateString()}</span>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>
